@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-Code for this paper [UMEC: Unified Model and Embedding Compression for Efficient Recommendation Systems]()
+Code for this paper [UMEC: Unified Model and Embedding Compression for Efficient Recommendation Systems](https://openreview.net/pdf?id=BM---bH_RSh)
 
 Jiayi Shen, Haotao Wang\*, Shupeng Gui*, Jianchao Tan, Zhangyang Wang, and Ji Liu
 
