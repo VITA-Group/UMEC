@@ -22,11 +22,11 @@ We perform the compression process on [DLRM](https://github.com/facebookresearch
 
 ### Unified Framework
 
-To implement to joint training and compressing under the resource constraint, please see the script in `script/joint_train.sh`.
+To implement joint training and compressing under the resource constraint, please see the script in `script/joint_train.sh`.
 
 ### Input feature selection
 
-To implement to joint training and compressing under the resource constraint, please see the script in `script/input_selection.sh`.
+To implement input selection under the resource constraint, please see the script in `script/input_selection.sh`.
 
 ## Acknowledgement
 
