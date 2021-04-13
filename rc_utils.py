@@ -3,7 +3,15 @@ from torch import nn
 from torch.nn import functional as F, Parameter
 import numpy as np
 
+def array1d_repr(t, format='{:.3f}'):
+    res = ''
+    for i in range(len(t)):
+        res += format.format(float(t[i]))
+        if i < len(t) - 1:
+            res += ', '
 
+    return '[' + res + ']'
+    
 class SteFloor(torch.autograd.Function):
     """
     Ste for floor function

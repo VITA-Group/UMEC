@@ -17,7 +17,8 @@ from torch.nn.utils import clip_grad_norm_
 from rc_utils import RC_CP_MiniMax, \
                      flops2, \
                      prox_w, \
-                     proj_dual
+                     proj_dual, \
+                     array1d_repr
 
 def rc_optimizer(optimizer, minimax_model, s_optimizer, dual_optimizer, args, infos,save_budgets):
 
@@ -84,7 +85,7 @@ def rc_optimizer(optimizer, minimax_model, s_optimizer, dual_optimizer, args, in
 def build_minimax_model(net_model, layer_names, bncp_layers, bncp_layers_dict, args):
     
     print('*'*40)
-    conv_layers = [m for m in net_model.modules() if isinstance(m, RCLinear)]
+    # conv_layers = [m for m in net_model.modules() if isinstance(m, RCLinear)]
     skip_layers = []
     minimax_model = RC_CP_MiniMax(net_model,
                                   resource_fn = None,
