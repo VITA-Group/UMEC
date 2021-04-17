@@ -124,7 +124,7 @@ from rc_utils import make_zero_w
 
 exc = getattr(builtins, "IOError", "FileNotFoundError")
 
-
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 def get_bncp_layers_dict(net_model, arg=None):
 
     """
@@ -139,10 +139,9 @@ def get_bncp_layers_dict(net_model, arg=None):
     for name, m in net_model.named_modules():
         print('name',name)
         print("m",m)
-        # if name == "top_l.0" or name == "top_l.2" or name == "top_l.4":
-        if type(m) == torch.nn.modules.linear.Linear and "top" in name:  # we only include the
+        if type(m) == torch.nn.modules.linear.Linear and "top" in name:  
             layer_names[m] = name
-            bncp_layers.append([m])  # question of whether it should add a list outside a list
+            bncp_layers.append([m]) 
 
     bncp_layers_dict = {}
     for i, ms in enumerate(bncp_layers):
@@ -567,18 +566,18 @@ if __name__ == "__main__":
         description="Train Deep Learning Recommendation Model (DLRM)"
     )
     # model related parameters
-    parser.add_argument("--exp_mode", type=str)
+    parser.add_argument("--exp_mode", type=str, default="rctrain")
     parser.add_argument("--coeff", type=float, default=0.01)
     parser.add_argument("--arch-sparse-feature-size", type=int, default=16)
     parser.add_argument(
         "--arch-embedding-size", type=dash_separated_ints, default="4-3-2")
     # j will be replaced with the table number
     parser.add_argument(
-        "--arch-mlp-bot", type=dash_separated_ints, default="4-3-16")
+        "--arch-mlp-bot", type=dash_separated_ints, default="13-512-256-64-16")
     parser.add_argument(
-        "--arch-mlp-top", type=dash_separated_ints, default="4-2-1")
+        "--arch-mlp-top", type=dash_separated_ints, default="512-256-1")
     parser.add_argument(
-        "--arch-interaction-op", type=str, choices=['dot', 'cat'], default="dot")
+        "--arch-interaction-op", type=str, choices=['dot', 'cat'], default="cat")
     parser.add_argument("--arch-interaction-itself", action="store_true", default=False)
     # embedding table options
     parser.add_argument("--md-flag", action="store_true", default=False)
@@ -591,21 +590,21 @@ if __name__ == "__main__":
     parser.add_argument("--qr-collisions", type=int, default=4)
     # activations and loss
     parser.add_argument("--activation-function", type=str, default="relu")
-    parser.add_argument("--loss-function", type=str, default="mse")  # or bce or wbce
+    parser.add_argument("--loss-function", type=str, default="bce")  # or bce or wbce
     parser.add_argument(
         "--loss-weights", type=dash_separated_floats, default="1.0-1.0")  # for wbce
     parser.add_argument("--loss-threshold", type=float, default=0.0)  # 1.0e-7
-    parser.add_argument("--round-targets", type=bool, default=False)
+    parser.add_argument("--round-targets", type=bool, default=True)
     # data
     parser.add_argument("--data-size", type=int, default=6)
     parser.add_argument("--num-batches", type=int, default=0)
     parser.add_argument(
-        "--data-generation", type=str, default="random"
+        "--data-generation", type=str, default="dataset"
     )  # synthetic or dataset
     parser.add_argument("--data-trace-file", type=str, default="./input/dist_emb_j.log")
     parser.add_argument("--data-set", type=str, default="kaggle")  # or terabyte
-    parser.add_argument("--raw-data-file", type=str, default="../data/day")
-    parser.add_argument("--processed-data-file", type=str, default="")
+    parser.add_argument("--raw-data-file", type=str, default="../kaggle/train.txt")
+    parser.add_argument("--processed-data-file", type=str, default="../kaggle/kaggleAdDisplayChallenge_processed.npz")
     parser.add_argument("--data-randomize", type=str, default="total")  # or day or none
     parser.add_argument("--data-trace-enable-padding", type=bool, default=False)
     parser.add_argument("--max-ind-range", type=int, default=-1)
@@ -615,9 +614,9 @@ if __name__ == "__main__":
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--memory-map", action="store_true", default=False)
     # training
-    parser.add_argument("--mini-batch-size", type=int, default=2)
+    parser.add_argument("--mini-batch-size", type=int, default=128)
     parser.add_argument("--nepochs", type=int, default=1)
-    parser.add_argument("--learning-rate", type=float, default=0.01)
+    parser.add_argument("--learning-rate", type=float, default=0.1)
     parser.add_argument("--print-precision", type=int, default=5)
     parser.add_argument("--numpy-rand-seed", type=int, default=123)
     parser.add_argument("--sync-dense-params", type=bool, default=True)
@@ -626,12 +625,12 @@ if __name__ == "__main__":
     # onnx
     parser.add_argument("--save-onnx", action="store_true", default=False)
     # gpu
-    parser.add_argument("--use-gpu", action="store_true", default=False)
+    parser.add_argument("--use-gpu", action="store_true", default=True)
     # debugging and profiling
-    parser.add_argument("--print-freq", type=int, default=1)
-    parser.add_argument("--test-freq", type=int, default=-1)
-    parser.add_argument("--test-mini-batch-size", type=int, default=-1)
-    parser.add_argument("--test-num-workers", type=int, default=-1)
+    parser.add_argument("--print-freq", type=int, default=1024)
+    parser.add_argument("--test-freq", type=int, default=1024)
+    parser.add_argument("--test-mini-batch-size", type=int, default=16384)
+    parser.add_argument("--test-num-workers", type=int, default=16)
     parser.add_argument("--print-time", action="store_true", default=False)
     parser.add_argument("--debug-mode", action="store_true", default=False)
     parser.add_argument("--enable-profiling", action="store_true", default=False)
@@ -655,7 +654,7 @@ if __name__ == "__main__":
     ############  ********** ********** ********** ********** ********** ********** ********** ********** ############
     # train_arg_parser = subparsers.add_parser("train", help="parser for training arguments")
 
-    parser.add_argument("--save-result-dir", type=str, default="",
+    parser.add_argument("--save-result-dir", type=str, default="../result/test/",
                         help="path to folder where trained model will be saved")                                      
     parser.add_argument("--checkpoint-model-dir", type=str, default=None,
                         help="path to folder where checkpoints of trained models will be saved")
@@ -674,7 +673,7 @@ if __name__ == "__main__":
                         help="number of batches after which a checkpoint of the trained model will be created")
 
     #### be useful
-    parser.add_argument('--punit', type=int, default=8,
+    parser.add_argument('--punit', type=int, default=1,
                         help='the smallest unit for pruning')
     parser.add_argument('--rc_tab', default=None,
                         help='resource table file (if None, use flops)')
@@ -694,7 +693,7 @@ if __name__ == "__main__":
                         help='dual lr for z')
     parser.add_argument('--ylr', default=1e-1, type=float,
                         help='dual lr for y')
-    parser.add_argument('--slr', default=1e-3, type=float,
+    parser.add_argument('--slr', default=0.05, type=float,
                         help='primal lr for s')
     parser.add_argument('--save_budgets',
                         default='0.5, 0.3, 0.1',
@@ -725,21 +724,10 @@ if __name__ == "__main__":
 
     if args.exp_mode == "rctrain":
         args.group_size = args.arch_sparse_feature_size
-        # input feature selection
-        # save_path_temp = "../result/group_size"+str(args.group_size)+"/"
         is_rctrain = True
 
     elif args.exp_mode == "baseline":
-        # save_path_temp = "../result/baseline/"
         is_rctrain = False
-
-
-
-    # if not os.path.exists(save_path_temp):
-    #     os.makedirs(save_path_temp)
-
-    # args.save_model = save_path_temp + "best.pt"   
-    #notation merge
 
 
 
@@ -1191,13 +1179,10 @@ if __name__ == "__main__":
                     lr_scheduler.step()
 
                     # modify 3
-                    # infos = {'epoch': 0, 'batch_id':0, 'total_iters': 0, 'total_loss': 0}  # should be tested later
-                    # flag = rc_optimizer(optimizer, minimax_model, s_optimizer, dual_optimizer, args, infos)
                     if is_rctrain:
                         infos = {'epoch': None, 'iter_index': j,
-                                 'loss_avg': None}  # should be tested later
+                                 'loss_avg': None} 
                         cur_resource,s_data = rc_optimizer(optimizer, minimax_model, s_optimizer, dual_optimizer, args, infos,save_budgets)
-                        # flag = rc_optimizer(optimizer, minimax_model, s_optimizer, dual_optimizer, args, infos)
 
                 if args.mlperf_logging:
                     total_time += iteration_time
