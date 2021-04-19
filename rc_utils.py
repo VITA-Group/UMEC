@@ -107,25 +107,25 @@ def flops2(s, bncp_layers_dict, process_layers,group_size, ub=None, sub=None, la
 def weight_list_to_scores(weight_list,layers_dict,group_size = 1, eps=None, optimizer=None):
     # input: weight matrix (a list containing one element )
     # output: L2 norm of the group tensors of the weight matrix (shape: the length of total groups of variables)
-    eps = None
-    if eps is not None:
-        return sum([optimizer.state[m.weight]['exp_avg_sq'].data.sqrt().add_(eps) * (m.weight.data ** 2)
-                    for m in weight_list])
-    else:
-        result = []
-        for m in weight_list:
-            if layers_dict[m] != 0: # hidden layers
-                result.append((m.weight.data ** 2).sum(0))
-            else:  # input layer
-                n_group = m.weight.data.shape[1] // group_size
-                for index_group in range(n_group):
-                    group_weight = m.weight.data[:,index_group * group_size : (index_group + 1) * group_size]
-                    group_weight = group_weight.reshape(-1)
-                    result.append((group_weight **2).sum(0))
-                result = [torch.tensor(result)]
+    # eps = None
+    # if eps is not None:
+    #     return sum([optimizer.state[m.weight]['exp_avg_sq'].data.sqrt().add_(eps) * (m.weight.data ** 2)
+    #                 for m in weight_list])
+    # else:
+    result = []
+    for m in weight_list:
+        if layers_dict[m] != 0: # hidden layers
+            result.append((m.weight.data ** 2).sum(0))
+        else:  # input layer
+            n_group = m.weight.data.shape[1] // group_size
+            for index_group in range(n_group):
+                group_weight = m.weight.data[:,index_group * group_size : (index_group + 1) * group_size]
+                group_weight = group_weight.reshape(-1)
+                result.append((group_weight **2).sum(0))
+            result = [torch.tensor(result)]
 
-        res = sum(result) 
-        return res
+    res = sum(result) 
+    return res
 
 class RC_CP_MiniMax(nn.Module):
     """

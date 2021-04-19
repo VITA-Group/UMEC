@@ -685,8 +685,6 @@ if __name__ == "__main__":
                         help='weight normalization for conv after bn')
     parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
                         help='momentum')
-    parser.add_argument('--optim', default='adam',
-                        help='optimizer for DNN Nets training')
     parser.add_argument('--soptim', default='sgd',
                         help='optimizer for DNN Sparsity training')
     parser.add_argument('--zlr', default=2.0, type=float,
